@@ -7,13 +7,14 @@ Outil d'optimisation Windows 10 / 11 en un seul fichier `.exe` (aucune installat
 1. Téléchargez **[`dist/Opti-PC.exe`](dist/Opti-PC.exe)**.
 2. Double-cliquez dessus → acceptez la demande administrateur (UAC).
    - Si Windows SmartScreen affiche « Windows a protégé votre ordinateur » : **Informations complémentaires → Exécuter quand même** (l'exécutable n'est pas signé numériquement).
-3. Tapez **`A`** pour tout optimiser, ou le numéro d'un module.
+3. Tapez **`D`** pour un diagnostic, puis **`A`** pour tout optimiser (ou le numéro d'un module).
 4. Redémarrez le PC à la fin.
 
 ## Ce que fait chaque module
 
 | # | Module | Détails | Réversible |
 |---|--------|---------|-----------|
+| **D** | **Diagnostic** | Détecte les vrais goulots d'étranglement : Windows sur disque dur, RAM insuffisante, une seule barrette (pas de double canal), XMP/EXPO désactivé, pilote graphique ancien, disque plein, trop de programmes au démarrage, PC jamais redémarré – avec un conseil pour chaque point | – |
 | 1 | Point de restauration | Créé automatiquement avant « Tout optimiser » | – |
 | 2 | Nettoyage en profondeur | %TEMP%, Windows\Temp, cache Windows Update, rapports d'erreurs, crash dumps, caches de shaders (DirectX/NVIDIA/AMD/Intel), caches navigateurs (Chrome, Edge, Brave, Opera, Firefox), Discord, miniatures, corbeille. **Historique, mots de passe et cookies ne sont pas touchés.** | Non (fichiers supprimés) |
 | 3 | Plan d'alimentation | « Performances optimales » (ou « Performances élevées »), disques jamais en veille, suspension USB désactivée | Oui |
@@ -26,6 +27,8 @@ Outil d'optimisation Windows 10 / 11 en un seul fichier `.exe` (aucune installat
 | 10 | Hibernation | Supprime `hiberfil.sys` (plusieurs Go). Ignoré sur PC portable en mode « Tout » | Oui |
 | 11 | Réparer Windows | DISM RestoreHealth + SFC + nettoyage des composants (manuel, 15-45 min) | – |
 | 12 | Démarrage | Liste les programmes lancés au démarrage et ouvre le Gestionnaire des tâches | – |
+| 13 | Mettre à jour les applications | `winget upgrade --all` : met à jour tous les logiciels installés (après confirmation) | – |
+| 14 | Supprimer les applis inutiles | Candy Crush, Disney+, Clipchamp, Actualités, Météo, Solitaire, Cortana… Liste affichée avant confirmation, réinstallables via le Store | Via le Store |
 | **A** | **Tout optimiser** | Point de restauration puis modules 2 à 10 | |
 | **R** | **Restaurer** | Remet tous les réglages modifiés à leurs valeurs Windows par défaut | |
 

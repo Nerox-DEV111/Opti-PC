@@ -30,6 +30,7 @@ type module struct {
 }
 
 var modules = []module{
+	{"D", "Diagnostic du PC", "Trouve ce qui ralentit vraiment votre PC (disque, RAM, XMP, pilotes...)", false, diagnostic, nil},
 	{"1", "Créer un point de restauration", "Sauvegarde de sécurité avant toute modification (recommandé)", false, func() { createRestorePoint() }, nil},
 	{"2", "Nettoyage en profondeur", "Fichiers temporaires, caches, Windows Update, corbeille, navigateurs", true, cleanup, nil},
 	{"3", "Plan d'alimentation maximal", "Active le mode « Performances optimales » de Windows", true, powerPlanApply, powerPlanRestore},
@@ -42,6 +43,8 @@ var modules = []module{
 	{"10", "Désactiver l'hibernation", "Libère plusieurs Go (fichier hiberfil.sys) – ignoré sur PC portable en mode « Tout »", true, hibernateOff, hibernateOn},
 	{"11", "Réparer Windows", "DISM + SFC : répare les fichiers système corrompus (15 à 45 min)", false, repairWindows, nil},
 	{"12", "Programmes au démarrage", "Liste les programmes lancés au démarrage et ouvre le gestionnaire", false, startupPrograms, nil},
+	{"13", "Mettre à jour les applications", "Met à jour tous les logiciels installés via winget", false, updateApps, nil},
+	{"14", "Supprimer les applis inutiles", "Candy Crush, Clipchamp, Actualités... (réinstallables via le Store)", false, removeBloatware, nil},
 }
 
 // ================================================================ Registre
@@ -526,25 +529,22 @@ func repairWindows() {
 
 // ================================================================ 12. Démarrage
 
-func startupPrograms() {
-	section("Programmes lancés au démarrage")
+type startupEntry struct{ name, cmd string }
+
+// startupEntries liste les programmes lancés au démarrage (registre + dossiers Démarrage).
+func startupEntries() []startupEntry {
+	var list []startupEntry
 	keys := []struct {
 		root registry.Key
-		name string
 		path string
 	}{
-		{HKCU, "Utilisateur", `Software\Microsoft\Windows\CurrentVersion\Run`},
-		{HKLM, "Tous les utilisateurs", `Software\Microsoft\Windows\CurrentVersion\Run`},
-		{HKLM, "Tous (32 bits)", `Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run`},
+		{HKCU, `Software\Microsoft\Windows\CurrentVersion\Run`},
+		{HKLM, `Software\Microsoft\Windows\CurrentVersion\Run`},
+		{HKLM, `Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run`},
 	}
-	total := 0
 	for _, k := range keys {
 		for name, cmd := range regValues(k.root, k.path) {
-			if len(cmd) > 70 {
-				cmd = cmd[:67] + "..."
-			}
-			fmt.Printf("  %s %-28s %s\n", col(cCyan, "•"), name, col(cDim, cmd))
-			total++
+			list = append(list, startupEntry{name, cmd})
 		}
 	}
 	for _, dir := range []string{
@@ -556,11 +556,27 @@ func startupPrograms() {
 			if strings.EqualFold(e.Name(), "desktop.ini") {
 				continue
 			}
-			fmt.Printf("  %s %-28s %s\n", col(cCyan, "•"), strings.TrimSuffix(e.Name(), ".lnk"), col(cDim, "(dossier Démarrage)"))
-			total++
+			list = append(list, startupEntry{strings.TrimSuffix(e.Name(), ".lnk"), "(dossier Démarrage)"})
 		}
 	}
-	fmt.Printf("\n  %d programme(s) au démarrage. Moins il y en a, plus Windows démarre vite.\n", total)
+	return list
+}
+
+func truncate(s string, n int) string {
+	r := []rune(s)
+	if len(r) <= n {
+		return s
+	}
+	return string(r[:n-3]) + "..."
+}
+
+func startupPrograms() {
+	section("Programmes lancés au démarrage")
+	list := startupEntries()
+	for _, e := range list {
+		fmt.Printf("  %s %-28s %s\n", col(cCyan, "•"), truncate(e.name, 28), col(cDim, truncate(e.cmd, 70)))
+	}
+	fmt.Printf("\n  %d programme(s) au démarrage. Moins il y en a, plus Windows démarre vite.\n", len(list))
 	if confirm("\n  Ouvrir le Gestionnaire des tâches pour en désactiver ?") {
 		exec.Command("taskmgr.exe", "/0", "/startup").Start()
 	}

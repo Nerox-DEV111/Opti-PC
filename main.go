@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const version = "1.0.0"
+const version = "1.1.0"
 
 const banner = `
    ____         __  _        ____   ______
