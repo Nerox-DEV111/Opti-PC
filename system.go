@@ -84,6 +84,8 @@ func runLive(name string, args ...string) error {
 }
 
 func powershell(script string) (string, error) {
+	// Sortie en UTF-8 pour lire correctement les chemins accentués.
+	script = "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; " + script
 	return runQuiet("powershell.exe", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script)
 }
 
