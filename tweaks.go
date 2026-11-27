@@ -41,7 +41,7 @@ var modules = []module{
 	{"7", "Confidentialité et arrière-plan", "Télémétrie, pubs, suggestions, services et tâches inutiles", true, privacyApply, privacyRestore},
 	{"8", "Réactivité du système", "Menus instantanés, priorité au premier plan, démarrage plus rapide", true, responsivenessApply, responsivenessRestore},
 	{"9", "Optimiser les disques", "TRIM pour SSD / défragmentation pour HDD", true, disksOptimize, nil},
-	{"10", "Désactiver l'hibernation", "Libère plusieurs Go (fichier hiberfil.sys) – ignoré sur PC portable en mode « Tout »", true, hibernateOff, hibernateOn},
+	{"10", "Désactiver l'hibernation", "Libère plusieurs Go (hiberfil.sys), conservée sur PC portable", true, hibernateOff, hibernateOn},
 	{"11", "Réparer Windows", "DISM + SFC : répare les fichiers système corrompus (15 à 45 min)", false, repairWindows, nil},
 	{"12", "Programmes au démarrage", "Liste les programmes lancés au démarrage et ouvre le gestionnaire", false, startupPrograms, nil},
 	{"13", "Mettre à jour les applications", "Met à jour tous les logiciels installés via winget", false, updateApps, nil},
