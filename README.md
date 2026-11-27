@@ -15,6 +15,7 @@ Outil d'optimisation Windows 10 / 11 en un seul fichier `.exe` (aucune installat
 | # | Module | Détails | Réversible |
 |---|--------|---------|-----------|
 | **D** | **Diagnostic** | Détecte les vrais goulots d'étranglement : Windows sur disque dur, RAM insuffisante, une seule barrette (pas de double canal), XMP/EXPO désactivé, pilote graphique ancien, disque plein, trop de programmes au démarrage, PC jamais redémarré – avec un conseil pour chaque point | – |
+| **S** | **Analyse de sécurité** | Voir la section ci-dessous | – |
 | 1 | Point de restauration | Créé automatiquement avant « Tout optimiser » | – |
 | 2 | Nettoyage en profondeur | %TEMP%, Windows\Temp, cache Windows Update, rapports d'erreurs, crash dumps, caches de shaders (DirectX/NVIDIA/AMD/Intel), caches navigateurs (Chrome, Edge, Brave, Opera, Firefox), Discord, miniatures, corbeille. **Historique, mots de passe et cookies ne sont pas touchés.** | Non (fichiers supprimés) |
 | 3 | Plan d'alimentation | « Performances optimales » (ou « Performances élevées »), disques jamais en veille, suspension USB désactivée | Oui |
@@ -32,6 +33,25 @@ Outil d'optimisation Windows 10 / 11 en un seul fichier `.exe` (aucune installat
 | **A** | **Tout optimiser** | Point de restauration puis modules 2 à 10 | |
 | **R** | **Restaurer** | Remet tous les réglages modifiés à leurs valeurs Windows par défaut | |
 
+## 🛡️ Analyse de sécurité (S)
+
+Deux modes : **rapide** (5-15 min) ou **complète** (1-3 h, Defender vérifie *tous* les fichiers de tous les disques).
+
+| Contrôle | Ce qui est détecté |
+|----------|--------------------|
+| **Microsoft Defender** | Mise à jour des signatures puis analyse rapide/complète ; protection en temps réel désactivée ; **exclusions ajoutées par un malware** (disque entier, `.exe`, dossiers AppData...) ; menaces trouvées |
+| **Démarrage automatique (backdoors)** | Clés Run/RunOnce, dossiers Démarrage, tâches planifiées, services, détournement de Winlogon, *Image File Execution Options*, AppInit_DLLs, abonnements WMI, remplacement de sethc/utilman (porte dérobée de l'écran de connexion). Chaque programme est vérifié : signature numérique, emplacement, PowerShell caché/encodé, faux noms système (`svchost.exe` hors de System32), double extension (`.pdf.exe`) |
+| **Voleurs de jetons (token grabbers)** | Injection dans Discord (`discord_desktop_core\index.js`) avec **réparation proposée** ; fichiers contenant des webhooks Discord, bots Telegram ou du code de vol de jetons/mots de passe dans AppData, Temp, Téléchargements |
+| **Processus et réseau** | Programmes non signés lancés depuis AppData/Temp qui communiquent sur Internet ou écoutent un port (RAT) ; faux processus système |
+| **Détournement réseau** | Fichier `hosts` bloquant les sites d'antivirus, proxy imposé |
+
+À la fin : résumé, **deuxième vérification par Defender** des fichiers suspects, conseils si une menace est trouvée
+(changement des mots de passe depuis un autre appareil, **Defender hors ligne**), et rapport `.txt` enregistré sur le Bureau.
+
+> ⚠️ Aucun outil ne peut garantir à 100 % l'absence de malware. Un « suspect » n'est pas forcément dangereux :
+> en cas de doute, envoyez le fichier sur [virustotal.com](https://www.virustotal.com). L'analyse ne supprime
+> jamais de fichier d'elle-même (seule la réparation de Discord est proposée, avec sauvegarde).
+
 ### Ce qu'Opti-PC ne fait volontairement PAS
 Désactiver Windows Defender, le pare-feu ou Windows Update, supprimer des applications système, modifier le BCD
 ou le fichier d'échange : ces « optimisations » rendent le PC moins sûr ou instable pour un gain nul ou négligeable.
@@ -48,5 +68,5 @@ go install github.com/tc-hib/go-winres@latest
 ./build.sh            # -> dist/Opti-PC.exe
 ```
 
-Le code est en Go (`main.go`, `tweaks.go`, `system.go`, `ui.go`) et se compile depuis Linux, macOS ou Windows.
+Le code est en Go (`main.go`, `tweaks.go`, `extras.go`, `scan*.go`, `system.go`, `ui.go`) et se compile depuis Linux, macOS ou Windows.
 L'icône est générée par `go run tools/genicon/main.go`.

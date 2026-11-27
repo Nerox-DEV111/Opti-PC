@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const version = "1.1.0"
+const version = "1.2.0"
 
 const banner = `
    ____         __  _        ____   ______
@@ -52,7 +52,9 @@ func main() {
 			}
 			resetCounters()
 			m.apply()
-			summary()
+			if nOK+nWarn+nFail > 0 {
+				summary()
+			}
 		}
 		pause()
 	}

@@ -31,6 +31,7 @@ type module struct {
 
 var modules = []module{
 	{"D", "Diagnostic du PC", "Trouve ce qui ralentit vraiment votre PC (disque, RAM, XMP, pilotes...)", false, diagnostic, nil},
+	{"S", "Analyse de sécurité", "Virus, chevaux de Troie, backdoors, voleurs de jetons Discord/navigateurs", false, securityScan, nil},
 	{"1", "Créer un point de restauration", "Sauvegarde de sécurité avant toute modification (recommandé)", false, func() { createRestorePoint() }, nil},
 	{"2", "Nettoyage en profondeur", "Fichiers temporaires, caches, Windows Update, corbeille, navigateurs", true, cleanup, nil},
 	{"3", "Plan d'alimentation maximal", "Active le mode « Performances optimales » de Windows", true, powerPlanApply, powerPlanRestore},
